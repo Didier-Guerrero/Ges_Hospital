@@ -1,0 +1,20 @@
+<h1>Comparación de Casos Médicos</h1>
+
+<% if (porcentajeExito) { %>
+<p>Total de casos similares: <%= totalCasos %></p>
+<p>Casos exitosos: <%= casosExitosos %></p>
+<p>Porcentaje de éxito: <%= porcentajeExito %>%</p>
+<link rel="stylesheet" href="/css/styles.css" />
+<h2>Tratamientos en Casos Similares:</h2>
+<ul>
+  <% tratamientos.forEach(tratamiento => { %>
+  <li>
+    <strong>Tratamiento:</strong> <%= tratamiento.tratamiento %><br />
+    <strong>Éxito:</strong> <%= tratamiento.exito ? 'Sí' : 'No' %><br />
+    <strong>Duración:</strong> <%= tratamiento.duracion %> días
+  </li>
+  <% }) %>
+</ul>
+<% } else { %>
+<p>No hay casos similares para comparar.</p>
+<% } %>

@@ -1,0 +1,64 @@
+<h1>Panel de Casos Médicos</h1>
+
+<!-- Botones de navegación -->
+<div>
+  <!-- Botón para cerrar sesión -->
+  <a href="/api/users/logout" class="button">Cerrar Sesión</a>
+
+  <!-- Botón para ver todos los casos sin filtros -->
+  <a href="/api/cases" class="button">Ver Todos los Casos</a>
+</div>
+
+<!-- Formulario de búsqueda de enfermedad -->
+<form action="/api/cases" method="get">
+  <input type="text" name="enfermedad" placeholder="Buscar por enfermedad" />
+  <button type="submit">Buscar</button>
+</form>
+
+<!-- Botón para mostrar/ocultar la lista completa de casos (sin filtros) -->
+<button onclick="toggleCases()">Mostrar/Ocultar Todos los Casos Médicos</button>
+
+<!-- Contenedor para todos los casos -->
+<div id="allCasesContainer" style="display: none">
+  <ul id="allCasesList">
+    <% cases.forEach(caso => { %>
+    <li>
+      <strong>Paciente:</strong> <%= caso.patientName %> <br />
+      <strong>Enfermedad:</strong> <%= caso.enfermedad %> <br />
+      <strong>Diagnóstico:</strong> <%= caso.diagnostico %> <br />
+      <strong>Fecha de Inicio:</strong> <%= caso.fecha_inicio %> <br />
+      <strong>Fecha Final:</strong> <%= caso.fecha_final %> <br />
+      <strong>Porcentaje de Éxito:</strong> <%= caso.porcentaje_exito %>%
+    </li>
+    <% }) %>
+  </ul>
+</div>
+
+<!-- Contenedor para los resultados de búsqueda -->
+<div id="searchResultsContainer">
+  <% if (searchResults && searchResults.length > 0) { %>
+  <h2>Resultados de Búsqueda</h2>
+  <ul>
+    <% searchResults.forEach(result => { %>
+    <li>
+      <strong>Paciente:</strong> <%= result.patientName %> <br />
+      <strong>Enfermedad:</strong> <%= result.enfermedad %> <br />
+      <strong>Diagnóstico:</strong> <%= result.diagnostico %> <br />
+      <strong>Fecha de Inicio:</strong> <%= result.fecha_inicio %> <br />
+      <strong>Fecha Final:</strong> <%= result.fecha_final %> <br />
+      <strong>Porcentaje de Éxito:</strong> <%= result.porcentaje_exito %>%
+    </li>
+    <% }) %>
+  </ul>
+  <% } else if (searchQuery) { %>
+  <p>No se encontraron casos para la búsqueda: "<%= searchQuery %>"</p>
+  <% } %>
+</div>
+
+<script>
+  function toggleCases() {
+    const container = document.getElementById("allCasesContainer");
+    container.style.display =
+      container.style.display === "none" ? "block" : "none";
+  }
+</script>

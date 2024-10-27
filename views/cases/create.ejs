@@ -1,0 +1,47 @@
+<h1>Crear Nueva Historia Médica</h1>
+<head>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<form action="/api/cases" method="POST">
+  <label>Seleccione Paciente:</label>
+  <select name="user_id" required>
+    <% pacientes.forEach(paciente => { %>
+    <option value="<%= paciente.id %>">
+      <%= paciente.nombre %> - <%= paciente.email %>
+    </option>
+    <% }) %>
+  </select>
+
+  <label>Enfermedad:</label>
+  <input type="text" name="enfermedad" required />
+
+  <label>Diagnóstico:</label>
+  <input type="text" name="diagnostico" required />
+
+  <label>Síntomas:</label>
+  <textarea name="sintomas" required></textarea>
+
+  <label>Tratamiento Inicial:</label>
+  <textarea name="tratamiento_inicial" required></textarea>
+
+  <label>Duración del Tratamiento (días):</label>
+  <input type="number" name="duracion_tratamiento" required min="1" />
+
+  <label>¿El Tratamiento fue Exitoso?</label>
+  <select name="exito" required>
+    <option value="true">Sí</option>
+    <option value="false">No</option>
+  </select>
+
+  <!-- Nuevos campos de fecha de inicio y fecha final -->
+  <label>Fecha de Inicio del Tratamiento:</label>
+  <input type="date" name="fecha_inicio" required />
+
+  <label>Fecha de Finalización del Tratamiento:</label>
+  <input type="date" name="fecha_final" required />
+
+  <label>Uso de Medicamento (en días):</label>
+  <input type="number" name="uso_medicamento_dias" min="0" required />
+
+  <button type="submit">Crear Historia Médica</button>
+</form>

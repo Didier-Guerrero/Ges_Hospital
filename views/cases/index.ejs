@@ -1,0 +1,23 @@
+<h1>Historias Médicas</h1>
+<head>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+
+<div style="display: flex; justify-content: space-between; margin-bottom: 20px">
+  <a href="/api/users/logout" class="button">Cerrar Sesión</a>
+
+  <% if (session.userRole === 'admin') { %>
+  <a href="/api/users/register" class="button">Crear Usuario</a>
+  <% } %>
+</div>
+
+<a href="/api/cases/new">Crear Nueva Historia Médica</a>
+<ul>
+  <% cases.forEach(caso => { %>
+  <li>
+    <a href="/api/cases/<%= caso.id %>"
+      ><%= caso.enfermedad %> - <%= caso.diagnostico %></a
+    >
+  </li>
+  <% }) %>
+</ul>

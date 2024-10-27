@@ -1,0 +1,48 @@
+<h1>Panel de Casos Médicos</h1>
+<head>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<div>
+  <!-- Botón para cerrar sesión -->
+  <a href="/api/users/logout" class="button">Cerrar Sesión</a>
+
+  <!-- Botón para ver todos los casos sin filtros -->
+  <a href="/api/cases" class="button">Ver Todos los Casos</a>
+</div>
+
+<!-- Formulario de búsqueda de enfermedad -->
+<form action="/api/cases" method="get">
+  <input type="text" name="enfermedad" placeholder="Buscar por enfermedad" />
+  <button type="submit">Buscar</button>
+</form>
+
+<!-- Lista de todos los casos o resultados de búsqueda -->
+<div id="casesContainer">
+  <% if (searchResults && searchResults.length > 0) { %>
+  <h2>Resultados de Búsqueda</h2>
+  <ul>
+    <% searchResults.forEach(result => { %>
+    <li>
+      <strong>Paciente:</strong> <%= result.patientName %> <br />
+      <strong>Enfermedad:</strong> <%= result.enfermedad %> <br />
+      <!-- Botón de ver más detalles -->
+      <a href="/api/cases/<%= result.id %>" class="button">Ver Más Detalles</a>
+    </li>
+    <% }) %>
+  </ul>
+  <% } else if (searchQuery) { %>
+  <p>No se encontraron casos para la búsqueda: "<%= searchQuery %>"</p>
+  <% } else { %>
+  <h2>Todos los Casos Médicos</h2>
+  <ul>
+    <% cases.forEach(caso => { %>
+    <li>
+      <strong>Paciente:</strong> <%= caso.patientName %> <br />
+      <strong>Enfermedad:</strong> <%= caso.enfermedad %> <br />
+      <!-- Botón de ver más detalles -->
+      <a href="/api/cases/<%= caso.id %>" class="button">Ver Más Detalles</a>
+    </li>
+    <% }) %>
+  </ul>
+  <% } %>
+</div>

@@ -1,0 +1,24 @@
+<h1>Detalles del Caso Médico</h1>
+<head>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<p><strong>Paciente:</strong> <%= caso.patientName %></p>
+<p><strong>Enfermedad:</strong> <%= caso.enfermedad %></p>
+<p><strong>Diagnóstico:</strong> <%= caso.diagnostico %></p>
+<p><strong>Síntomas:</strong> <%= caso.sintomas %></p>
+<p><strong>Tratamiento Inicial:</strong> <%= caso.tratamiento_inicial %></p>
+<p><strong>Fecha de Inicio:</strong> <%= caso.fecha_inicio %></p>
+<p><strong>Fecha Final:</strong> <%= caso.fecha_final %></p>
+<p><strong>Porcentaje de Éxito:</strong> <%= caso.porcentaje_exito %>%</p>
+
+<form
+  action="/api/cases/<%= caso.id %>?_method=DELETE"
+  method="POST"
+  style="display: inline"
+>
+  <button type="submit" class="button">Eliminar Caso</button>
+</form>
+
+<a href="/api/cases/<%= caso.id %>/edit" class="button">Modificar Caso</a>
+
+<a href="/api/cases" class="button">Volver a la Lista</a>

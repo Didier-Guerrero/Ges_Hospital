@@ -1,0 +1,22 @@
+<h1>Registro de Usuario</h1>
+<head>
+  <link rel="stylesheet" href="/css/styles.css" />
+</head>
+<form action="/api/users/register" method="POST">
+  <label>Nombre:</label>
+  <input type="text" name="nombre" required />
+
+  <label>Email:</label>
+  <input type="email" name="email" required />
+
+  <label>Contraseña:</label>
+  <input type="password" name="password" required />
+
+  <label>Rol:</label>
+  <select name="role">
+    <option value="medico">Médico</option>
+    <option value="paciente">Paciente</option>
+  </select>
+
+  <button type="submit">Registrar</button>
+</form>

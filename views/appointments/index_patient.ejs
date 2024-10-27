@@ -1,0 +1,16 @@
+<h1>Mis Citas Médicas</h1>
+
+<!-- Botón de Cerrar Sesión -->
+<div style="text-align: right; margin-bottom: 20px">
+  <a href="/api/users/logout" class="button">Cerrar Sesión</a>
+</div>
+
+<ul>
+  <% appointments.forEach(appointment => { %>
+  <li>
+    <strong>Fecha:</strong> <%= appointment.date %> <br />
+    <strong>Hora:</strong> <%= appointment.time %> <br />
+    <strong>Doctor:</strong> <%= appointment.doctorName %>
+  </li>
+  <% }) %>
+</ul>

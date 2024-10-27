@@ -1,0 +1,36 @@
+<h1>Editar Historia Médica</h1>
+<head><link rel="stylesheet" href="/css/styles.css"></head>
+<form action="/api/cases/<%= caso.id %>?_method=PUT" method="POST">
+  <label>Paciente:</label>
+  <select name="user_id" required>
+    <% pacientes.forEach(paciente => { %>
+      <option value="<%= paciente.id %>" <%= caso.user_id === paciente.id ? 'selected' : '' %>>
+        <%= paciente.nombre %>
+      </option>
+    <% }) %>
+  </select>
+
+  <label>Enfermedad:</label>
+  <input type="text" name="enfermedad" value="<%= caso.enfermedad %>" required />
+
+  <label>Diagnóstico:</label>
+  <input type="text" name="diagnostico" value="<%= caso.diagnostico %>" required />
+
+  <label>Síntomas:</label>
+  <textarea name="sintomas" required><%= caso.sintomas %></textarea>
+
+  <label>Tratamiento Inicial:</label>
+  <textarea name="tratamiento_inicial" required><%= caso.tratamiento_inicial %></textarea>
+
+  <label>Fecha de Inicio del Tratamiento:</label>
+  <input type="date" name="fecha_inicio" value="<%= caso.fecha_inicio ? caso.fecha_inicio.toISOString().slice(0, 10) : '' %>" required />
+
+  <label>Fecha de Finalización del Tratamiento:</label>
+  <input type="date" name="fecha_final" value="<%= caso.fecha_final ? caso.fecha_final.toISOString().slice(0, 10) : '' %>" required />
+
+  <label>Uso de Medicamento (en días):</label>
+  <input type="number" name="uso_medicamento_dias" value="<%= caso.uso_medicamento_dias || 0 %>" required min="0" />
+
+  <button type="submit">Actualizar Historia Médica</button>
+</form>
+
