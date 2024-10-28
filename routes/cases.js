@@ -4,7 +4,7 @@ const caseController = require("../controllers/caseController");
 const auth = require("../middleware/auth");
 
 router.get("/new", auth, caseController.showCreateCaseForm);
-
+router.post("/", auth, caseController.createCase);
 router.get("/", auth, caseController.getCases);
 router.get("/:id", auth, caseController.getCaseById);
 router.get("/:id/edit", auth, caseController.showEditCaseForm);
