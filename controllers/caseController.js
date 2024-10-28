@@ -1,7 +1,6 @@
 const Case = require("../models/Case");
 const User = require("../models/User");
 
-// Lista de todas las historias médicas según el rol del usuario
 exports.getCases = async (req, res) => {
   try {
     const { enfermedad } = req.query;
@@ -20,7 +19,6 @@ exports.getCases = async (req, res) => {
     ) {
       let data, error;
 
-      // Obtener los casos y todos los usuarios con rol de paciente
       if (enfermedad) {
         ({ data, error } = await Case.findByEnfermedad(enfermedad));
         searchResults = data || [];
@@ -29,27 +27,16 @@ exports.getCases = async (req, res) => {
         cases = data || [];
       }
 
-      // Depuración: Verificar los casos obtenidos
-      console.log("Casos obtenidos:", cases);
-
       const { data: pacientes, error: patientsError } = await User.findByRole(
         "paciente"
       );
       if (patientsError) throw patientsError;
 
-      // Depuración: Verificar los pacientes obtenidos
-      console.log("Pacientes obtenidos:", pacientes);
-
-      // Crear un diccionario de pacientes con el user_id como clave y el nombre como valor
       const pacientesDict = {};
       pacientes.forEach((paciente) => {
         pacientesDict[paciente.id] = paciente.nombre;
       });
 
-      // Depuración: Verificar el diccionario de pacientes
-      console.log("Diccionario de pacientes:", pacientesDict);
-
-      // Asignar el nombre de cada paciente a su respectivo caso
       cases = cases.map((caso) => ({
         ...caso,
         patientName: pacientesDict[caso.user_id] || "Paciente no encontrado",
@@ -60,13 +47,13 @@ exports.getCases = async (req, res) => {
         patientName: pacientesDict[result.user_id] || "Paciente no encontrado",
       }));
 
-      // Depuración: Verificar los casos con nombres de pacientes asignados
       console.log("Casos con nombres asignados:", cases);
 
       res.render("cases/index_doctor_admin", {
         cases,
         searchResults,
         searchQuery,
+        userRole: req.session.userRole,
       });
     } else {
       res.status(403).send("Acceso denegado");
@@ -77,7 +64,6 @@ exports.getCases = async (req, res) => {
   }
 };
 
-// Crear una nueva historia médica con cálculo de porcentaje de éxito
 exports.createCase = async (req, res) => {
   const {
     user_id,
@@ -134,7 +120,6 @@ exports.createCase = async (req, res) => {
   }
 };
 
-// Obtener los detalles de una historia médica por ID
 exports.getCaseById = async (req, res) => {
   try {
     const { data: caso, error } = await Case.findById(req.params.id);
@@ -143,13 +128,11 @@ exports.getCaseById = async (req, res) => {
         .status(404)
         .render("errors/404", { message: "Caso no encontrado" });
 
-    // Obtener el nombre del paciente asociado al caso
     const { data: paciente, error: pacienteError } = await User.findById(
       caso.user_id
     );
     if (pacienteError) throw pacienteError;
 
-    // Asignar el nombre del paciente al caso para la vista
     caso.patientName = paciente ? paciente.nombre : "Paciente no encontrado";
 
     res.render("cases/show", { caso });
@@ -161,7 +144,6 @@ exports.getCaseById = async (req, res) => {
   }
 };
 
-// Renderizar el formulario de creación de casos médicos
 exports.showCreateCaseForm = async (req, res) => {
   if (req.session.userRole === "medico" || req.session.userRole === "admin") {
     try {
@@ -180,7 +162,6 @@ exports.showCreateCaseForm = async (req, res) => {
   }
 };
 
-// Renderizar el formulario de edición de casos médicos
 exports.showEditCaseForm = async (req, res) => {
   try {
     const { id } = req.params;
@@ -192,17 +173,14 @@ exports.showEditCaseForm = async (req, res) => {
         .status(404)
         .render("errors/404", { message: "Caso no encontrado" });
 
-    // Convertir fecha_inicio y fecha_final a objetos Date si existen
     caso.fecha_inicio = caso.fecha_inicio ? new Date(caso.fecha_inicio) : null;
     caso.fecha_final = caso.fecha_final ? new Date(caso.fecha_final) : null;
 
-    // Obtener la lista de pacientes para el dropdown
     const { data: pacientes, error: patientsError } = await User.findByRole(
       "paciente"
     );
     if (patientsError) throw patientsError;
 
-    // Renderizar la vista de edición con el caso y los pacientes
     res.render("cases/edit", { caso, pacientes });
   } catch (error) {
     console.error("Error al cargar el formulario de edición:", error);
@@ -212,7 +190,6 @@ exports.showEditCaseForm = async (req, res) => {
   }
 };
 
-// Actualizar una historia médica
 exports.updateCase = async (req, res) => {
   const {
     user_id,
@@ -229,12 +206,10 @@ exports.updateCase = async (req, res) => {
     const fechaInicio = new Date(fecha_inicio);
     const fechaFinal = new Date(fecha_final);
 
-    // Calcular duración real del tratamiento en días
     const duracionRealTratamiento = Math.ceil(
       (fechaFinal - fechaInicio) / (1000 * 60 * 60 * 24)
     );
 
-    // Calcular el porcentaje de éxito basado en la duración y el uso del medicamento
     let porcentajeExito = 0;
 
     if (uso_medicamento_dias >= duracionRealTratamiento * 0.8) {
@@ -245,7 +220,6 @@ exports.updateCase = async (req, res) => {
       porcentajeExito = 50;
     }
 
-    // Actualizar el caso con los datos y el nuevo porcentaje de éxito
     const { error } = await Case.update(req.params.id, {
       user_id,
       enfermedad,
@@ -270,7 +244,6 @@ exports.updateCase = async (req, res) => {
   }
 };
 
-// Eliminar una historia médica
 exports.deleteCase = async (req, res) => {
   try {
     const { error } = await Case.delete(req.params.id);
@@ -285,7 +258,6 @@ exports.deleteCase = async (req, res) => {
   }
 };
 
-// Comparación de casos médicos
 exports.compareCases = async (req, res) => {
   try {
     const { enfermedad } = req.body;
