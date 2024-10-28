@@ -21,6 +21,11 @@
         <% if (userRole === 'admin') { %>
         <a href="/api/users/register" class="button">Registrar Nuevo Usuario</a>
         <% } %>
+
+        <!-- Mostrar botón de registrar caso médico si es admin o médico -->
+        <% if (userRole === 'admin' || userRole === 'medico') { %>
+        <a href="/api/cases/new" class="button">Registrar Nuevo Caso Médico</a>
+        <% } %>
       </div>
 
       <!-- Formulario de búsqueda de enfermedad -->
