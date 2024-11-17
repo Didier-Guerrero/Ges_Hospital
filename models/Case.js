@@ -2,7 +2,9 @@ const supabase = require("../config/supabase");
 
 class Case {
   static async create(data) {
-    return await supabase.from("cases").insert([data]);
+    return await supabase.from("cases").insert([data]).select();
+    if (error) throw new Error(`Error al crear caso: ${error.message}`);
+    return createdCase;
   }
 
   static async findAll() {
@@ -30,6 +32,16 @@ class Case {
       .select("*")
       .ilike("enfermedad", `%${enfermedad}%`);
   }
+  static async findSimilarEnfermedad(enfermedad) {
+    const keywords = enfermedad.split(" ").map((word) => `%${word}%`);
+
+    const query = keywords
+      .map((_, index) => `enfermedad ilike $${index + 1}`)
+      .join(" OR ");
+
+    return await supabase.from("cases").select("*").filter(query, keywords);
+  }
+
   static async findAllByUserId(userId) {
     const { data, error } = await supabase
       .from("cases")

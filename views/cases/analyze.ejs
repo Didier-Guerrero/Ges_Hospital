@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Análisis del Caso Médico</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Análisis del Caso Médico</h1>
+      <p><strong>Paciente:</strong> <%= caso.patientName %></p>
+      <p><strong>Enfermedad:</strong> <%= caso.enfermedad %></p>
+      <p><strong>Diagnóstico:</strong> <%= caso.diagnostico %></p>
+      <p>
+        <strong>Porcentaje de Éxito General:</strong> <%= porcentajeExito %>%
+      </p>
+
+      <h2>Casos Similares</h2>
+      <% if (casosSimilares.length > 0) { %>
+      <ul>
+        <% casosSimilares.forEach(similar => { %>
+        <li>
+          <strong>Paciente:</strong> <%= similar.patientName || "Desconocido" %>
+          <br />
+          <strong>Enfermedad:</strong> <%= similar.enfermedad %> <br />
+          <strong>Éxito:</strong> <%= similar.exito ? "Sí" : "No" %> <br />
+          <strong>Duración:</strong> <%= similar.duracion_tratamiento %> días
+        </li>
+        <% }) %>
+      </ul>
+      <% } else { %>
+      <p>No se encontraron casos similares registrados.</p>
+      <% } %>
+
+      <a href="/api/cases" class="button">Volver</a>
+    </div>
+  </body>
+</html>

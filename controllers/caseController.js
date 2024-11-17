@@ -113,10 +113,63 @@ exports.createCase = async (req, res) => {
 
     if (error) throw error;
 
-    res.redirect("/api/cases");
+    res.redirect(`/api/cases/${data[0].id}/options`);
   } catch (error) {
     console.error("Error al crear el caso médico:", error.message);
     res.status(500).json({ message: "Error al crear el caso médico" });
+  }
+};
+
+exports.showOptions = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data: caso, error } = await Case.findById(id);
+    if (error || !caso) throw new Error("Caso no encontrado");
+
+    res.render("cases/options", { caso });
+  } catch (error) {
+    console.error("Error al cargar las opciones del caso:", error.message);
+    res.status(500).json({ message: "Error al cargar las opciones del caso" });
+  }
+};
+
+exports.analyzeCase = async (req, res) => {
+  try {
+    const { id } = req.params;
+
+    const { data: caso, error: caseError } = await Case.findById(id);
+    if (caseError || !caso) throw new Error("Caso no encontrado");
+
+    const { data: casosSimilares, error } = await Case.findSimilarEnfermedad(
+      caso.enfermedad
+    );
+
+    if (error) throw error;
+
+    const casosExitosos = casosSimilares.filter((c) => c.exito).length;
+    const porcentajeExito = (
+      (casosExitosos / casosSimilares.length) *
+      100
+    ).toFixed(2);
+
+    res.render("cases/analyze", {
+      caso,
+      casosSimilares,
+      porcentajeExito,
+    });
+  } catch (error) {
+    console.error("Error al analizar el caso:", error.message);
+    res.status(500).json({ message: "Error al analizar el caso médico" });
+  }
+};
+
+exports.storeCase = async (req, res) => {
+  try {
+    res.redirect("/api/cases");
+  } catch (error) {
+    console.error("Error al almacenar el caso:", error.message);
+    res.status(500).json({ message: "Error al almacenar el caso médico" });
   }
 };
 

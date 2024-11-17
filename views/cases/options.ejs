@@ -1,0 +1,27 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Opciones del Caso Médico</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Caso Médico Registrado</h1>
+      <p>¿Qué desea hacer con este caso?</p>
+
+      <div class="button-group">
+        <!-- Botón para analizar el caso -->
+        <form action="/api/cases/<%= caso.id %>/analyze" method="POST">
+          <button type="submit" class="button">Analizar Caso</button>
+        </form>
+
+        <!-- Botón para almacenar el caso -->
+        <form action="/api/cases/<%= caso.id %>/store" method="POST">
+          <button type="submit" class="button">Solo Almacenar Caso</button>
+        </form>
+      </div>
+    </div>
+  </body>
+</html>
