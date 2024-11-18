@@ -33,13 +33,14 @@ class Case {
       .ilike("enfermedad", `%${enfermedad}%`);
   }
   static async findSimilarEnfermedad(enfermedad) {
-    const keywords = enfermedad.split(" ").map((word) => `%${word}%`);
+    if (!enfermedad) throw new Error("El campo enfermedad es requerido");
 
-    const query = keywords
-      .map((_, index) => `enfermedad ilike $${index + 1}`)
-      .join(" OR ");
+    const firstWord = enfermedad.split(" ")[0];
 
-    return await supabase.from("cases").select("*").filter(query, keywords);
+    return await supabase
+      .from("cases")
+      .select("*")
+      .ilike("enfermedad", `%${firstWord}%`);
   }
 
   static async findAllByUserId(userId) {

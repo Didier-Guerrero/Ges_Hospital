@@ -141,10 +141,13 @@ exports.analyzeCase = async (req, res) => {
     const { data: caso, error: caseError } = await Case.findById(id);
     if (caseError || !caso) throw new Error("Caso no encontrado");
 
+    if (!caso.enfermedad || caso.enfermedad.trim() === "") {
+      throw new Error("La enfermedad no está definida para este caso");
+    }
+
     const { data: casosSimilares, error } = await Case.findSimilarEnfermedad(
       caso.enfermedad
     );
-
     if (error) throw error;
 
     const casosExitosos = casosSimilares.filter((c) => c.exito).length;
@@ -160,7 +163,9 @@ exports.analyzeCase = async (req, res) => {
     });
   } catch (error) {
     console.error("Error al analizar el caso:", error.message);
-    res.status(500).json({ message: "Error al analizar el caso médico" });
+    res
+      .status(500)
+      .json({ message: `Error al analizar el caso médico: ${error.message}` });
   }
 };
 

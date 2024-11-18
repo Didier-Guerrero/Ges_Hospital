@@ -12,12 +12,10 @@
       <p>¿Qué desea hacer con este caso?</p>
 
       <div class="button-group">
-        <!-- Botón para analizar el caso -->
         <form action="/api/cases/<%= caso.id %>/analyze" method="POST">
           <button type="submit" class="button">Analizar Caso</button>
         </form>
 
-        <!-- Botón para almacenar el caso -->
         <form action="/api/cases/<%= caso.id %>/store" method="POST">
           <button type="submit" class="button">Solo Almacenar Caso</button>
         </form>

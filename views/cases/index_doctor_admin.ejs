@@ -11,24 +11,17 @@
       <h1>Panel de Casos Médicos</h1>
 
       <div>
-        <!-- Botón para cerrar sesión -->
         <a href="/api/users/logout" class="button">Cerrar Sesión</a>
 
-        <!-- Botón para ver todos los casos sin filtros -->
         <a href="/api/cases" class="button">Ver Todos los Casos</a>
 
-        <!-- Mostrar botón de registro solo si el rol es admin -->
         <% if (userRole === 'admin') { %>
         <a href="/api/users/register" class="button">Registrar Nuevo Usuario</a>
-        <% } %>
-
-        <!-- Mostrar botón de registrar caso médico si es admin o médico -->
-        <% if (userRole === 'admin' || userRole === 'medico') { %>
+        <% } %> <% if (userRole === 'admin' || userRole === 'medico') { %>
         <a href="/api/cases/new" class="button">Registrar Nuevo Caso Médico</a>
         <% } %>
       </div>
 
-      <!-- Formulario de búsqueda de enfermedad -->
       <form action="/api/cases" method="get">
         <input
           type="text"
@@ -38,7 +31,6 @@
         <button type="submit">Buscar</button>
       </form>
 
-      <!-- Lista de todos los casos o resultados de búsqueda -->
       <div id="casesContainer">
         <% if (searchResults && searchResults.length > 0) { %>
         <h2>Resultados de Búsqueda</h2>
@@ -47,7 +39,6 @@
           <li>
             <strong>Paciente:</strong> <%= result.patientName %> <br />
             <strong>Enfermedad:</strong> <%= result.enfermedad %> <br />
-            <!-- Botón de ver más detalles -->
             <a href="/api/cases/<%= result.id %>" class="button"
               >Ver Más Detalles</a
             >
@@ -63,7 +54,6 @@
           <li>
             <strong>Paciente:</strong> <%= caso.patientName %> <br />
             <strong>Enfermedad:</strong> <%= caso.enfermedad %> <br />
-            <!-- Botón de ver más detalles -->
             <a href="/api/cases/<%= caso.id %>" class="button"
               >Ver Más Detalles</a
             >
