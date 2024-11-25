@@ -193,7 +193,11 @@ exports.getCaseById = async (req, res) => {
 
     caso.patientName = paciente ? paciente.nombre : "Paciente no encontrado";
 
-    res.render("cases/show", { caso });
+    // Detecta si viene desde la vista de análisis
+    const fromAnalyze = req.query.fromAnalyze === "true";
+    const originalCase = req.query.originalCase;
+
+    res.render("cases/show", { caso, fromAnalyze, originalCase });
   } catch (error) {
     console.error("Error al obtener el caso:", error);
     res

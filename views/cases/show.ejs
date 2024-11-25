@@ -21,4 +21,9 @@
 
 <a href="/api/cases/<%= caso.id %>/edit" class="button">Modificar Caso</a>
 
-<a href="/api/cases" class="button">Volver a la Lista</a>
+<a
+  href="<%= fromAnalyze ? `/api/cases/${originalCase}/analyze` : '/api/cases' %>"
+  class="button"
+>
+  Volver
+</a>

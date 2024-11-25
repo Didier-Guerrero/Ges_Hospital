@@ -26,6 +26,13 @@
           <strong>Enfermedad:</strong> <%= similar.enfermedad %> <br />
           <strong>Éxito:</strong> <%= similar.exito ? "Sí" : "No" %> <br />
           <strong>Duración:</strong> <%= similar.duracion_tratamiento %> días
+          <br />
+          <a
+            href="/api/cases/<%= similar.id %>?fromAnalyze=true&originalCase=<%= caso.id %>"
+            class="button"
+          >
+            Ver Más Detalles
+          </a>
         </li>
         <% }) %>
       </ul>

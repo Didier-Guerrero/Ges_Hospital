@@ -15,6 +15,7 @@ router.post("/compare", auth, caseController.compareCases);
 
 router.get("/:id/options", auth, caseController.showOptions);
 router.post("/:id/analyze", auth, caseController.analyzeCase);
+router.get("/:id/analyze", auth, caseController.analyzeCase);
 router.post("/:id/store", auth, caseController.storeCase);
 
 module.exports = router;
