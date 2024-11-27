@@ -43,6 +43,29 @@ class Case {
       .ilike("enfermedad", `%${firstWord}%`);
   }
 
+  static async markAsCompleted(id) {
+    const { data, error } = await supabase
+      .from("cases")
+      .update({ completado: true })
+      .eq("id", id)
+      .select();
+
+    if (error)
+      throw new Error(`Error al marcar como completado: ${error.message}`);
+    return data;
+  }
+
+  static async findSessionsByCaseId(caseId) {
+    const { data, error } = await supabase
+      .from("sessions")
+      .select("*")
+      .eq("case_id", caseId)
+      .order("fecha", { ascending: true });
+
+    if (error) throw new Error(`Error al obtener sesiones: ${error.message}`);
+    return data;
+  }
+
   static async findAllByUserId(userId) {
     const { data, error } = await supabase
       .from("cases")

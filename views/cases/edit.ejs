@@ -31,6 +31,13 @@
   <label>Uso de Medicamento (en días):</label>
   <input type="number" name="uso_medicamento_dias" value="<%= caso.uso_medicamento_dias || 0 %>" required min="0" />
 
+  <label>Estado del Caso:</label>
+  <select name="completado" required>
+    <option value="false" <%= !caso.completado ? '' : 'selected' %>>Incompleto</option>
+    <option value="true" <%= caso.completado ? 'selected' : '' %>>Completo</option>
+  </select>
+
+
   <button type="submit">Actualizar Historia Médica</button>
 </form>
 

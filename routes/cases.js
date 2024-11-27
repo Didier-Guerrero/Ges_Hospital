@@ -18,4 +18,6 @@ router.post("/:id/analyze", auth, caseController.analyzeCase);
 router.get("/:id/analyze", auth, caseController.analyzeCase);
 router.post("/:id/store", auth, caseController.storeCase);
 
+router.get("/:id/edit-treatment", caseController.showEditTreatmentForm);
+
 module.exports = router;

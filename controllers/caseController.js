@@ -1,5 +1,6 @@
 const Case = require("../models/Case");
 const User = require("../models/User");
+const SessionModel = require("../models/Session");
 
 exports.getCases = async (req, res) => {
   try {
@@ -72,7 +73,6 @@ exports.createCase = async (req, res) => {
     sintomas,
     tratamiento_inicial,
     duracion_tratamiento,
-    exito,
     fecha_inicio,
     fecha_final,
     uso_medicamento_dias,
@@ -104,19 +104,22 @@ exports.createCase = async (req, res) => {
       sintomas,
       tratamiento_inicial,
       duracion_tratamiento: duracionRealTratamiento,
-      exito: exito === "true",
       porcentaje_exito: porcentajeExito,
-      fecha_inicio,
-      fecha_final,
-      uso_medicamento_dias,
+      fecha_inicio: fechaInicio.toISOString(),
+      fecha_final: fechaFinal.toISOString(),
+      uso_medicamento_dias: parseInt(uso_medicamento_dias, 10),
+      completado: false, // Añadido según la nueva lógica
     });
 
     if (error) throw error;
 
+    // Redirigir al flujo correcto con el ID devuelto
     res.redirect(`/api/cases/${data[0].id}/options`);
   } catch (error) {
     console.error("Error al crear el caso médico:", error.message);
-    res.status(500).json({ message: "Error al crear el caso médico" });
+    res
+      .status(500)
+      .json({ message: `Error al crear el caso médico: ${error.message}` });
   }
 };
 
@@ -124,13 +127,45 @@ exports.showOptions = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { data: caso, error } = await Case.findById(id);
-    if (error || !caso) throw new Error("Caso no encontrado");
+    // Asegúrate de que el ID es un número válido
+    if (!id || isNaN(Number(id))) {
+      console.error("El ID proporcionado no es válido:", id);
+      return res
+        .status(400)
+        .json({ message: "El ID proporcionado no es válido." });
+    }
 
+    console.log("ID recibido en showOptions:", id); // Depuración: verifica el ID recibido
+
+    // Realiza la consulta a Supabase
+    const { data: caso, error } = await Case.findById(id);
+
+    // Depuración: verifica si hubo error en la consulta
+    if (error) {
+      console.error(
+        `Error en la consulta a Supabase para ID ${id}:`,
+        error.message
+      );
+      throw new Error("Error en la base de datos");
+    }
+
+    // Depuración: verifica si no se encontró el caso
+    if (!caso) {
+      console.error(`Caso con ID ${id} no encontrado en la base de datos`);
+      return res.status(404).json({ message: "Caso no encontrado" });
+    }
+
+    console.log(`Caso encontrado con ID ${id}:`, caso); // Depuración: muestra los datos encontrados
+
+    // Renderiza la vista con los datos del caso
     res.render("cases/options", { caso });
   } catch (error) {
     console.error("Error al cargar las opciones del caso:", error.message);
-    res.status(500).json({ message: "Error al cargar las opciones del caso" });
+
+    // Devuelve un error 500 con un mensaje más detallado para depuración
+    res.status(500).json({
+      message: `Error al cargar las opciones del caso: ${error.message}`,
+    });
   }
 };
 
@@ -138,6 +173,7 @@ exports.analyzeCase = async (req, res) => {
   try {
     const { id } = req.params;
 
+    // Buscar el caso principal
     const { data: caso, error: caseError } = await Case.findById(id);
     if (caseError || !caso) throw new Error("Caso no encontrado");
 
@@ -145,27 +181,52 @@ exports.analyzeCase = async (req, res) => {
       throw new Error("La enfermedad no está definida para este caso");
     }
 
-    const { data: casosSimilares, error } = await Case.findSimilarEnfermedad(
-      caso.enfermedad
+    // Obtener el nombre del paciente asociado al caso principal
+    const { data: paciente, error: pacienteError } = await User.findById(
+      caso.user_id
     );
-    if (error) throw error;
+    if (pacienteError) {
+      console.error(
+        "Error al obtener paciente del caso principal:",
+        pacienteError.message
+      );
+      throw new Error(
+        "Error al obtener el paciente asociado al caso principal."
+      );
+    }
+    caso.patientName = paciente ? paciente.nombre : "Paciente no encontrado";
 
-    const casosExitosos = casosSimilares.filter((c) => c.exito).length;
-    const porcentajeExito = (
-      (casosExitosos / casosSimilares.length) *
-      100
-    ).toFixed(2);
+    // Buscar casos similares
+    const { data: casosSimilares, error: similarError } =
+      await Case.findSimilarEnfermedad(caso.enfermedad);
+    if (similarError) throw new Error("Error al buscar casos similares.");
+
+    // Obtener los nombres de los pacientes para los casos similares
+    for (const similar of casosSimilares) {
+      const { data: pacienteSimilar, error: pacienteSimilarError } =
+        await User.findById(similar.user_id);
+      if (pacienteSimilarError) {
+        console.error(
+          `Error al obtener paciente del caso similar ${similar.id}:`,
+          pacienteSimilarError.message
+        );
+        similar.patientName = "Paciente no encontrado";
+      } else {
+        similar.patientName = pacienteSimilar
+          ? pacienteSimilar.nombre
+          : "Paciente no encontrado";
+      }
+    }
 
     res.render("cases/analyze", {
       caso,
       casosSimilares,
-      porcentajeExito,
     });
   } catch (error) {
     console.error("Error al analizar el caso:", error.message);
-    res
-      .status(500)
-      .json({ message: `Error al analizar el caso médico: ${error.message}` });
+    res.status(500).json({
+      message: `Error al analizar el caso médico: ${error.message}`,
+    });
   }
 };
 
@@ -180,29 +241,144 @@ exports.storeCase = async (req, res) => {
 
 exports.getCaseById = async (req, res) => {
   try {
-    const { data: caso, error } = await Case.findById(req.params.id);
-    if (error || !caso)
-      return res
-        .status(404)
-        .render("errors/404", { message: "Caso no encontrado" });
+    const caseId = parseInt(req.params.id, 10);
+
+    if (isNaN(caseId)) {
+      return res.status(400).render("errors/400", {
+        message: "ID del caso inválido. Debe ser un número.",
+      });
+    }
+
+    const { data: caso, error: caseError } = await Case.findById(caseId);
+    if (caseError || !caso) {
+      return res.status(404).render("errors/404", {
+        message: "Caso no encontrado.",
+      });
+    }
+
+    const { data: sesiones, error: sessionError } =
+      await SessionModel.findByCaseId(caseId);
+    if (sessionError) {
+      console.error("Error al obtener sesiones:", sessionError.message);
+      return res.status(500).render("errors/500", {
+        message: "Error al obtener las sesiones asociadas.",
+      });
+    }
+
+    const sesionesExitosas =
+      sesiones?.filter((sesion) => sesion.exito).length || 0;
+    caso.porcentaje_exito =
+      sesiones?.length > 0
+        ? ((sesionesExitosas / sesiones.length) * 100).toFixed(2)
+        : 0;
 
     const { data: paciente, error: pacienteError } = await User.findById(
       caso.user_id
     );
-    if (pacienteError) throw pacienteError;
+    if (pacienteError) {
+      console.error("Error al obtener paciente:", pacienteError.message);
+      throw new Error("Error al obtener el paciente asociado al caso.");
+    }
 
     caso.patientName = paciente ? paciente.nombre : "Paciente no encontrado";
 
-    // Detecta si viene desde la vista de análisis
     const fromAnalyze = req.query.fromAnalyze === "true";
     const originalCase = req.query.originalCase;
 
-    res.render("cases/show", { caso, fromAnalyze, originalCase });
+    // Obtener el tratamiento inicial del caso original si viene de analyze
+    let tratamientoAnalizado = null;
+    if (fromAnalyze && originalCase) {
+      const { data: originalCaseData, error: originalCaseError } =
+        await Case.findById(originalCase);
+      if (!originalCaseError && originalCaseData) {
+        tratamientoAnalizado = originalCaseData.tratamiento_inicial;
+      }
+    }
+
+    res.render("cases/show", {
+      caso,
+      sesiones: sesiones || [],
+      fromAnalyze,
+      originalCase,
+      tratamientoAnalizado, // Nuevo dato
+    });
   } catch (error) {
-    console.error("Error al obtener el caso:", error);
-    res
-      .status(500)
-      .render("errors/500", { message: "Error al obtener la historia médica" });
+    console.error("Error al obtener el caso médico:", error.message);
+    res.status(500).render("errors/500", {
+      message: `Error al obtener la historia médica: ${error.message}`,
+    });
+  }
+};
+
+exports.showEditTreatmentForm = async (req, res) => {
+  try {
+    const { id } = req.params; // ID del caso que se va a editar (originalCase)
+    const { tratamientoAnalizado } = req.query; // Tratamiento del caso analizado
+
+    // Buscar el caso por ID
+    const { data: caso, error: caseError } = await Case.findById(id);
+    if (caseError || !caso) {
+      return res.status(404).render("errors/404", {
+        message: "Caso no encontrado.",
+      });
+    }
+
+    res.render("cases/edit-treatment", {
+      caso,
+      tratamientoAnalizado,
+    });
+  } catch (error) {
+    console.error(
+      "Error al cargar la vista de edición de tratamiento:",
+      error.message
+    );
+    res.status(500).render("errors/500", {
+      message: "Error al cargar la vista de edición de tratamiento.",
+    });
+  }
+};
+
+exports.createSession = async (req, res) => {
+  try {
+    const { id } = req.params; // ID del caso médico
+    const { evolucion, exito, tratamiento, notas } = req.body;
+
+    const nuevaSesion = {
+      case_id: id,
+      fecha: new Date(),
+      evolucion,
+      exito: exito === "true",
+      tratamiento,
+      notas,
+    };
+
+    const { error } = await SessionModel.create(nuevaSesion);
+    if (error) throw error;
+
+    // Recalcular el porcentaje de éxito después de crear la sesión
+    const { data: sesiones, error: sessionError } =
+      await SessionModel.findByCaseId(id);
+    if (sessionError) throw sessionError;
+
+    const totalSesiones = sesiones.length;
+    const sesionesExitosas = sesiones.filter((sesion) => sesion.exito).length;
+
+    const porcentajeExito =
+      totalSesiones > 0
+        ? ((sesionesExitosas / totalSesiones) * 100).toFixed(2)
+        : 0;
+
+    const { error: updateError } = await Case.update(id, {
+      porcentaje_exito: parseFloat(porcentajeExito),
+    });
+    if (updateError) throw updateError;
+
+    res.redirect(`/api/cases/${id}`);
+  } catch (error) {
+    console.error("Error al crear la sesión:", error.message);
+    res.status(500).render("errors/500", {
+      message: "Error al crear la sesión",
+    });
   }
 };
 
@@ -262,9 +438,12 @@ exports.updateCase = async (req, res) => {
     fecha_inicio,
     fecha_final,
     uso_medicamento_dias,
+    completado,
   } = req.body;
 
   try {
+    console.log("Datos recibidos para actualización:", req.body);
+
     const fechaInicio = new Date(fecha_inicio);
     const fechaFinal = new Date(fecha_final);
 
@@ -293,13 +472,14 @@ exports.updateCase = async (req, res) => {
       fecha_inicio,
       fecha_final,
       uso_medicamento_dias,
+      completado: completado === "true",
     });
 
     if (error) throw error;
 
     res.redirect(`/api/cases/${req.params.id}`);
   } catch (error) {
-    console.error("Error al actualizar el caso:", error);
+    console.error("Error al actualizar el caso:", error.message);
     res.status(500).render("errors/500", {
       message: "Error al actualizar la historia médica",
     });

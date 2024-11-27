@@ -3,14 +3,17 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Error Interno del Servidor</title>
+    <title>Error del Servidor</title>
+    <link rel="stylesheet" href="/css/styles.css" />
   </head>
   <body>
-    <h1>Error 500 - Error Interno del Servidor</h1>
-    <p>
-      <%= message || "Ocurrió un error inesperado. Inténtalo de nuevo más
-      tarde." %>
-    </p>
-    <a href="/api/cases">Volver a la lista de casos</a>
+    <div class="container">
+      <h1>Error 500</h1>
+      <p>Ocurrió un error inesperado en el servidor.</p>
+      <% if (message) { %>
+      <p><strong>Mensaje del error:</strong> <%= message %></p>
+      <% } %>
+      <a href="/" class="button">Volver al Inicio</a>
+    </div>
   </body>
 </html>

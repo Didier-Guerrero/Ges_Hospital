@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Tratamiento Basado en Caso Analizado</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Editar Tratamiento Basado en Caso Analizado</h1>
+      <form action="/api/cases/<%= caso.id %>?_method=PUT" method="POST">
+        <!-- Tratamiento Original: Solo Lectura -->
+        <label for="tratamientoOriginal">Tratamiento Original:</label>
+        <textarea id="tratamientoOriginal" name="tratamientoOriginal" readonly>
+<%= caso.tratamiento_inicial %></textarea
+        >
+
+        <!-- Nuevo Tratamiento Editable -->
+        <label for="nuevoTratamiento">Nuevo Tratamiento Inicial:</label>
+        <textarea id="nuevoTratamiento" name="tratamiento_inicial" required>
+<%= tratamientoAnalizado %></textarea
+        >
+
+        <button type="submit" class="button">Guardar Cambios</button>
+      </form>
+
+      <a href="/api/cases/<%= caso.id %>" class="button">Cancelar</a>
+    </div>
+  </body>
+</html>

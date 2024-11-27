@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Añadir Nueva Sesión</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <h1>Añadir Nueva Sesión</h1>
+    <form action="/api/sessions/<%= caseId %>" method="POST">
+      <label for="fecha">Fecha de la Sesión:</label>
+      <input type="date" name="fecha" id="fecha" required />
+
+      <label for="evolucion">Evolución:</label>
+      <textarea name="evolucion" id="evolucion" required></textarea>
+
+      <label for="tratamiento">Tratamiento:</label>
+      <textarea name="tratamiento" id="tratamiento" required></textarea>
+
+      <label for="notas">Observaciones:</label>
+      <textarea name="observaciones" id="observaciones"></textarea>
+
+      <label for="exito">¿Fue Exitosa?</label>
+      <select name="exito" id="exito" required>
+        <option value="true">Sí</option>
+        <option value="false">No</option>
+      </select>
+
+      <button type="submit">Guardar Sesión</button>
+    </form>
+  </body>
+</html>

@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalles de la Sesión</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Detalles de la Sesión</h1>
+      <p><strong>Fecha:</strong> <%= sesion.fecha %></p>
+      <p><strong>Evolución:</strong> <%= sesion.evolucion %></p>
+      <p><strong>Éxito:</strong> <%= sesion.exito ? "Sí" : "No" %></p>
+      <p><strong>Tratamiento:</strong> <%= sesion.tratamiento %></p>
+      <p><strong>Observaciones:</strong> <%= sesion.observaciones %></p>
+
+      <!-- Botón para editar la sesión -->
+      <a href="/api/sessions/<%= sesion.id %>/edit" class="button"
+        >Editar Sesión</a
+      >
+
+      <!-- Botón para eliminar la sesión -->
+      <form
+        action="/api/sessions/<%= sesion.id %>?_method=DELETE"
+        method="POST"
+        style="display: inline"
+      >
+        <button type="submit" class="button">Eliminar Sesión</button>
+      </form>
+
+      <!-- Botón para volver al caso médico -->
+      <a href="/api/cases/<%= caso.id %>" class="button"
+        >Volver al Caso Médico</a
+      >
+    </div>
+  </body>
+</html>
