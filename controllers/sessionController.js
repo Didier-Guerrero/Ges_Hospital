@@ -1,7 +1,7 @@
-const Case = require("../models/Case");
 const Session = require("../models/Session");
+const Case = require("../models/Case");
+const ExamModel = require("../models/Exam");
 
-// Muestra el formulario para crear una nueva sesión
 exports.showCreateSessionForm = async (req, res) => {
   try {
     const { id } = req.params; // ID del caso médico
@@ -20,7 +20,6 @@ exports.showCreateSessionForm = async (req, res) => {
   }
 };
 
-// Crear una nueva sesión
 exports.createSession = async (req, res) => {
   try {
     const { id } = req.params; // ID del caso médico
@@ -66,7 +65,18 @@ exports.showSessionDetails = async (req, res) => {
       });
     }
 
-    res.render("sessions/details", { sesion, caso });
+    // Obtener los exámenes asociados a esta sesión
+    const { data: examenes, error: examenesError } =
+      await ExamModel.findBySessionId(id);
+    if (examenesError) {
+      console.error(
+        `Error al obtener exámenes de la sesión ${id}:`,
+        examenesError.message
+      );
+      throw new Error("Error al obtener los exámenes asociados a la sesión.");
+    }
+
+    res.render("sessions/details", { sesion, caso, examenes });
   } catch (error) {
     console.error("Error al mostrar los detalles de la sesión:", error.message);
     res.status(500).render("errors/500", {

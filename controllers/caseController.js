@@ -1,6 +1,7 @@
 const Case = require("../models/Case");
 const User = require("../models/User");
 const SessionModel = require("../models/Session");
+const ExamModel = require("../models/Exam");
 
 exports.getCases = async (req, res) => {
   try {
@@ -14,10 +15,7 @@ exports.getCases = async (req, res) => {
       if (error) throw error;
       cases = data || [];
       res.render("cases/index_patient", { cases });
-    } else if (
-      req.session.userRole === "medico" ||
-      req.session.userRole === "admin"
-    ) {
+    } else if (["medico", "admin"].includes(req.session.userRole)) {
       let data, error;
 
       if (enfermedad) {
@@ -256,7 +254,7 @@ exports.getCaseById = async (req, res) => {
       });
     }
 
-    const { data: sesiones, error: sessionError } =
+    const { data: sesiones = [], error: sessionError } =
       await SessionModel.findByCaseId(caseId);
     if (sessionError) {
       console.error("Error al obtener sesiones:", sessionError.message);
@@ -265,10 +263,23 @@ exports.getCaseById = async (req, res) => {
       });
     }
 
-    const sesionesExitosas =
-      sesiones?.filter((sesion) => sesion.exito).length || 0;
+    const examenes = [];
+    for (const sesion of sesiones) {
+      const { data: examenesSesion, error: examenesError } =
+        await ExamModel.findBySessionId(sesion.id);
+      if (examenesError) {
+        console.error(
+          `Error al obtener exámenes para la sesión ${sesion.id}:`,
+          examenesError.message
+        );
+        continue;
+      }
+      examenes.push(...(examenesSesion || []));
+    }
+
+    const sesionesExitosas = sesiones.filter((sesion) => sesion.exito).length;
     caso.porcentaje_exito =
-      sesiones?.length > 0
+      sesiones.length > 0
         ? ((sesionesExitosas / sesiones.length) * 100).toFixed(2)
         : 0;
 
@@ -285,22 +296,12 @@ exports.getCaseById = async (req, res) => {
     const fromAnalyze = req.query.fromAnalyze === "true";
     const originalCase = req.query.originalCase;
 
-    // Obtener el tratamiento inicial del caso original si viene de analyze
-    let tratamientoAnalizado = null;
-    if (fromAnalyze && originalCase) {
-      const { data: originalCaseData, error: originalCaseError } =
-        await Case.findById(originalCase);
-      if (!originalCaseError && originalCaseData) {
-        tratamientoAnalizado = originalCaseData.tratamiento_inicial;
-      }
-    }
-
     res.render("cases/show", {
       caso,
       sesiones: sesiones || [],
+      examenes,
       fromAnalyze,
       originalCase,
-      tratamientoAnalizado, // Nuevo dato
     });
   } catch (error) {
     console.error("Error al obtener el caso médico:", error.message);
@@ -309,7 +310,6 @@ exports.getCaseById = async (req, res) => {
     });
   }
 };
-
 exports.showEditTreatmentForm = async (req, res) => {
   try {
     const { id } = req.params; // ID del caso que se va a editar (originalCase)

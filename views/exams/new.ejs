@@ -1,0 +1,59 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Solicitar Nuevo Examen</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Solicitar Nuevo Examen</h1>
+      <form action="/api/exams/new" method="POST">
+        <!-- Campo oculto para la sesión -->
+        <input type="hidden" name="sessionId" value="<%= sessionId %>" />
+        <input type="hidden" name="caseId" value="<%= sesion.case_id %>" />
+
+        <label for="type">Tipo de Examen:</label>
+        <input
+          type="text"
+          id="type"
+          name="type"
+          placeholder="Ejemplo: Examen de sangre"
+          required
+        />
+
+        <label for="requested_date">Fecha de Solicitud:</label>
+        <input type="date" id="requested_date" name="requested_date" required />
+
+        <label for="observations">Observaciones:</label>
+        <textarea
+          id="observations"
+          name="observations"
+          placeholder="Especifica de qué trata el examen (Ejemplo: Sangre, Hemograma, etc.)"
+        ></textarea>
+
+        <label for="result">Resultado (Opcional):</label>
+        <textarea
+          id="result"
+          name="result"
+          placeholder="Ingresa el resultado del examen, si está disponible"
+        ></textarea>
+
+        <label for="completion_date">Fecha de Completado (Opcional):</label>
+        <input type="date" id="completion_date" name="completion_date" />
+
+        <label for="status">Estado:</label>
+        <select id="status" name="status" required>
+          <option value="Pendiente">Pendiente</option>
+          <option value="En Proceso">En Proceso</option>
+          <option value="Completado">Completado</option>
+        </select>
+
+        <button type="submit" class="button">Solicitar Examen</button>
+      </form>
+
+      <a href="/api/sessions/<%= sessionId %>" class="button">Cancelar</a>
+    </div>
+  </body>
+</html>

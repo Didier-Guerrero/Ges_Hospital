@@ -15,6 +15,34 @@
       <p><strong>Tratamiento:</strong> <%= sesion.tratamiento %></p>
       <p><strong>Observaciones:</strong> <%= sesion.observaciones %></p>
 
+      <!-- Sección para mostrar los exámenes asociados a la sesión -->
+      <h2>Exámenes Solicitados</h2>
+      <% if (examenes && examenes.length > 0) { %>
+      <ul>
+        <% examenes.forEach(examen => { %>
+        <li>
+          <p><strong>Tipo de Examen:</strong> <%= examen.type %></p>
+          <p>
+            <strong>Fecha de Solicitud:</strong> <%= examen.requested_date %>
+          </p>
+          <p>
+            <strong>Estado:</strong>
+            <%= examen.completion_date ? `Completado el
+            ${examen.completion_date}` : "Pendiente" %>
+          </p>
+          <a href="/api/exams/<%= examen.id %>" class="button">Ver Detalles</a>
+        </li>
+        <% }) %>
+      </ul>
+      <% } else { %>
+      <p>No hay exámenes solicitados para esta sesión.</p>
+      <% } %>
+
+      <!-- Botón para solicitar un nuevo examen -->
+      <a href="/api/exams/new?sessionId=<%= sesion.id %>" class="button"
+        >Solicitar Nuevo Examen</a
+      >
+
       <!-- Botón para editar la sesión -->
       <a href="/api/sessions/<%= sesion.id %>/edit" class="button"
         >Editar Sesión</a

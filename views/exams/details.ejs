@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Detalles del Examen</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Detalles del Examen</h1>
+      <p><strong>Tipo de Examen:</strong> <%= examen.type %></p>
+      <p><strong>Fecha de Solicitud:</strong> <%= examen.requested_date %></p>
+      <p>
+        <strong>Fecha Tentativa de Completado :</strong>
+        <%= examen.completion_date ? examen.completion_date : "No completado" %>
+      </p>
+      <p>
+        <strong>Resultado:</strong> <%= examen.result ? examen.result : "N/A" %>
+      </p>
+      <p><strong>Estado:</strong> <%= examen.status %></p>
+      <p><strong>Observaciones:</strong> <%= examen.observations %></p>
+
+      <!-- Botón para editar el examen -->
+      <a href="/api/exams/<%= examen.id %>/edit" class="button"
+        >Editar Examen</a
+      >
+
+      <!-- Botón para eliminar el examen -->
+      <form
+        action="/api/exams/<%= examen.id %>?_method=DELETE&sessionId=<%= examen.session_id %>"
+        method="POST"
+        style="display: inline"
+      >
+        <button type="submit" class="button">Eliminar Examen</button>
+      </form>
+
+      <!-- Botón para volver a la sesión -->
+      <a href="/api/sessions/<%= examen.session_id %>" class="button">Volver</a>
+    </div>
+  </body>
+</html>

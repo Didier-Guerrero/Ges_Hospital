@@ -63,6 +63,30 @@
       <p>No hay sesiones registradas para este caso.</p>
       <% } %>
 
+      <h2>Exámenes Solicitados</h2>
+      <% if (examenes && examenes.length > 0) { %>
+      <ul>
+        <% examenes.forEach(examen => { %>
+        <li>
+          <p><strong>Tipo de Examen:</strong> <%= examen.type %></p>
+          <p>
+            <strong>Fecha de Solicitud:</strong> <%= examen.requested_date %>
+          </p>
+          <p>
+            <strong>Estado:</strong>
+            <%= examen.status %> - <%= examen.completion_date ? `Completado el
+            ${examen.completion_date}` : "Pendiente" %>
+          </p>
+          <a href="/api/exams/<%= examen.id %>" class="button"
+            >Ver Detalles del Examen</a
+          >
+        </li>
+        <% }) %>
+      </ul>
+      <% } else { %>
+      <p>No hay exámenes solicitados para este caso.</p>
+      <% } %>
+
       <!-- Mostrar botón adicional si viene desde análisis -->
       <% if (fromAnalyze) { %>
       <form

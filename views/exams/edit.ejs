@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Examen</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Editar Examen</h1>
+      <form action="/api/exams/<%= examen.id %>?_method=PUT" method="POST">
+        <label for="type">Tipo de Examen:</label>
+        <input
+          type="text"
+          id="type"
+          name="type"
+          value="<%= examen.type %>"
+          required
+        />
+
+        <label for="requested_date">Fecha de Solicitud:</label>
+        <input
+          type="date"
+          id="requested_date"
+          name="requested_date"
+          value="<%= examen.requested_date ? examen.requested_date.toISOString().split('T')[0] : '' %>"
+          required
+        />
+
+        <label for="completion_date">Fecha de Completado (Opcional):</label>
+        <input
+          type="date"
+          id="completion_date"
+          name="completion_date"
+          value="<%= examen.completion_date ? examen.completion_date.toISOString().split('T')[0] : '' %>"
+        />
+
+        <label for="status">Estado:</label>
+        <select id="status" name="status" required>
+          <option value="Pendiente" <%= examen.status === "Pendiente" ? "selected" : "" %>>Pendiente</option>
+          <option value="Completado" <%= examen.status === "Completado" ? "selected" : "" %>>Completado</option>
+        </select>
+
+        <label for="observations">Observaciones:</label>
+        <textarea
+          id="observations"
+          name="observations"
+          rows="3"
+        ><%= examen.observations || "" %></textarea>
+
+        <label for="result">Resultados (Opcional):</label>
+        <textarea
+          id="result"
+          name="result"
+          rows="3"
+        ><%= examen.result || "" %></textarea>
+
+        <button type="submit" class="button">Guardar Cambios</button>
+      </form>
+      <a href="/api/exams/<%= examen.id %>" class="button">Cancelar</a>
+    </div>
+  </body>
+</html>

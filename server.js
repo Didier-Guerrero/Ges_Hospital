@@ -47,6 +47,7 @@ app.get("/", (req, res) => {
 app.use("/api/cases", require("./routes/cases"));
 app.use("/api/users", require("./routes/users"));
 app.use("/api/sessions", require("./routes/sessions"));
+app.use("/api/exams", require("./routes/examRoutes"));
 
 // Manejo de errores para rutas no encontradas
 app.use((req, res) => {
