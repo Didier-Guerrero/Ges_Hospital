@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Editar Sesión</title>
+    <link rel="stylesheet" href="/css/styles.css" />
+  </head>
+  <body>
+    <div class="container">
+      <h1>Editar Sesión</h1>
+      <form action="/api/sessions/<%= sesion.id %>?_method=PUT" method="POST">
+        <label for="fecha">Fecha de la Sesión:</label>
+        <input
+          type="date"
+          name="fecha"
+          id="fecha"
+          value="<%= new Date(sesion.fecha).toISOString().split('T')[0] %>"
+          required
+        />
+ 
+        <label for="evolucion">Evolución:</label>
+        <textarea name="evolucion" id="evolucion" required><%= sesion.evolucion %></textarea>
+ 
+        <label for="tratamiento">Tratamiento:</label>
+        <textarea name="tratamiento" id="tratamiento" required><%= sesion.tratamiento %></textarea>
+ 
+        <label for="notas">Observaciones:</label>
+        <textarea name="observaciones" id="observaciones"><%= sesion.observaciones || '' %></textarea>
+ 
+        <label for="exito">¿Fue Exitosa?</label>
+        <select name="exito" id="exito" required>
+          <option value="true" <%= sesion.exito ? 'selected' : '' %>>Sí</option>
+          <option value="false" <%= !sesion.exito ? 'selected' : '' %>>No</option>
+        </select>
+ 
+        <button type="submit">Actualizar Sesión</button>
+      </form>
+      <a href="/api/cases/<%= sesion.case_id %>" class="button">Cancelar</a>
+    </div>
+  </body>
+</html>
+ 
+tiene menú contextual

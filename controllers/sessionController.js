@@ -110,7 +110,8 @@ exports.updateSession = async (req, res) => {
     const { id } = req.params;
     const { evolucion, tratamiento, observaciones, exito } = req.body;
 
-    const { error } = await Session.update(id, {
+    // Actualizar la sesión
+    const { data: updatedSession, error } = await Session.update(id, {
       evolucion,
       tratamiento,
       observaciones,
@@ -119,7 +120,18 @@ exports.updateSession = async (req, res) => {
 
     if (error) throw new Error("Error al actualizar la sesión.");
 
-    res.redirect(`/api/sessions/${id}`);
+    console.log("Sesión actualizada:", updatedSession);
+
+    // Buscar la sesión para obtener el case_id relacionado
+    const { data: sesion, error: sessionError } = await Session.findById(id);
+
+    if (sessionError || !sesion) {
+      return res.status(404).render("errors/404", {
+        message: "Sesión no encontrada.",
+      });
+    }
+
+    res.redirect(`/api/cases/${sesion.case_id}`);
   } catch (error) {
     console.error("Error al actualizar la sesión:", error.message);
     res.status(500).render("errors/500", {
@@ -132,10 +144,24 @@ exports.deleteSession = async (req, res) => {
   try {
     const { id } = req.params;
 
-    const { error } = await Session.delete(id);
+    // Buscar la sesión para obtener el case_id antes de eliminar
+    const { data: sesion, error: sessionError } = await Session.findById(id);
+    if (sessionError || !sesion) {
+      return res.status(404).render("errors/404", {
+        message: "Sesión no encontrada.",
+      });
+    }
+
+    const caseId = sesion.case_id; // Obtener el case_id relacionado
+
+    // Eliminar la sesión
+    const { data: deletedSession, error } = await Session.delete(id);
     if (error) throw new Error("Error al eliminar la sesión.");
 
-    res.redirect(`/api/cases/${req.query.caseId}`);
+    console.log("Sesión eliminada:", deletedSession);
+
+    // Redirigir al caso médico relacionado
+    res.redirect(`/api/cases/${caseId}`);
   } catch (error) {
     console.error("Error al eliminar la sesión:", error.message);
     res.status(500).render("errors/500", {

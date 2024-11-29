@@ -100,20 +100,36 @@ class Session {
       .eq("id", id)
       .single();
     if (error) throw new Error(`Error al obtener sesión: ${error.message}`);
-    return { data, error: null };
+    return { data };
   }
 
   static async update(id, updates) {
-    const { error } = await supabase
+    const { data, error } = await supabase
       .from("sessions")
       .update(updates)
-      .eq("id", id);
+      .eq("id", id)
+      .select(); // Asegura devolver datos actualizados si existen
+
     if (error) throw new Error(`Error al actualizar sesión: ${error.message}`);
+
+    return { data, error }; // Devuelve un objeto con data y error
   }
 
   static async delete(id) {
-    const { error } = await supabase.from("sessions").delete().eq("id", id);
+    const { data, error } = await supabase
+      .from("sessions")
+      .delete()
+      .eq("id", id)
+      .select(); // Asegura devolver información de los registros eliminados
+
     if (error) throw new Error(`Error al eliminar sesión: ${error.message}`);
+
+    // Si no se elimina ningún registro, lanzar un error personalizado
+    if (!data || data.length === 0) {
+      throw new Error(`No se encontró ninguna sesión con ID: ${id}`);
+    }
+
+    return { data, error }; // Retorna siempre un objeto con `data` y `error`
   }
 }
 

@@ -106,7 +106,7 @@ exports.createCase = async (req, res) => {
       fecha_inicio: fechaInicio.toISOString(),
       fecha_final: fechaFinal.toISOString(),
       uso_medicamento_dias: parseInt(uso_medicamento_dias, 10),
-      completado: false, // Añadido según la nueva lógica
+      completado: false,
     });
 
     if (error) throw error;
@@ -125,7 +125,6 @@ exports.showOptions = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Asegúrate de que el ID es un número válido
     if (!id || isNaN(Number(id))) {
       console.error("El ID proporcionado no es válido:", id);
       return res
@@ -133,12 +132,8 @@ exports.showOptions = async (req, res) => {
         .json({ message: "El ID proporcionado no es válido." });
     }
 
-    console.log("ID recibido en showOptions:", id); // Depuración: verifica el ID recibido
-
-    // Realiza la consulta a Supabase
     const { data: caso, error } = await Case.findById(id);
 
-    // Depuración: verifica si hubo error en la consulta
     if (error) {
       console.error(
         `Error en la consulta a Supabase para ID ${id}:`,
@@ -199,7 +194,6 @@ exports.analyzeCase = async (req, res) => {
       await Case.findSimilarEnfermedad(caso.enfermedad);
     if (similarError) throw new Error("Error al buscar casos similares.");
 
-    // Obtener los nombres de los pacientes para los casos similares
     for (const similar of casosSimilares) {
       const { data: pacienteSimilar, error: pacienteSimilarError } =
         await User.findById(similar.user_id);
@@ -312,8 +306,8 @@ exports.getCaseById = async (req, res) => {
 };
 exports.showEditTreatmentForm = async (req, res) => {
   try {
-    const { id } = req.params; // ID del caso que se va a editar (originalCase)
-    const { tratamientoAnalizado } = req.query; // Tratamiento del caso analizado
+    const { id } = req.params;
+    const { tratamientoAnalizado } = req.query;
 
     // Buscar el caso por ID
     const { data: caso, error: caseError } = await Case.findById(id);
@@ -340,7 +334,7 @@ exports.showEditTreatmentForm = async (req, res) => {
 
 exports.createSession = async (req, res) => {
   try {
-    const { id } = req.params; // ID del caso médico
+    const { id } = req.params;
     const { evolucion, exito, tratamiento, notas } = req.body;
 
     const nuevaSesion = {

@@ -2,20 +2,23 @@ const express = require("express");
 const router = express.Router();
 const sessionController = require("../controllers/sessionController");
 
-// Rutas para sesiones
-router.get("/new/:id", sessionController.showCreateSessionForm); // Formulario para crear sesión
+// Formulario para crear una nueva sesión
+router.get("/new/:id", sessionController.showCreateSessionForm);
 router.post("/create", sessionController.createSession);
-router.post("/:id", sessionController.createSession); // Crear una nueva sesión
+router.post("/:id", sessionController.createSession);
+// Crear una nueva sesión
+router.post("/", sessionController.createSession);
 
+// Mostrar detalles de una sesión
 router.get("/:id", sessionController.showSessionDetails);
 
 // Mostrar formulario de edición de sesión
 router.get("/:id/edit", sessionController.showEditSessionForm);
 
-// Actualizar sesión
-router.post("/:id?_method=PUT", sessionController.updateSession);
+// Actualizar una sesión
+router.put("/:id", sessionController.updateSession);
 
-// Eliminar sesión
-router.post("/:id?_method=DELETE", sessionController.deleteSession);
+// Eliminar una sesión
+router.delete("/:id", sessionController.deleteSession);
 
 module.exports = router;

@@ -64,10 +64,8 @@ exports.showExamDetails = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Depuración del ID recibido
     console.log("ID recibido para detalles del examen:", id);
 
-    // Buscar el examen por ID
     const examen = await Exam.findById(id);
 
     if (!examen) {
@@ -92,7 +90,6 @@ exports.showEditExamForm = async (req, res) => {
   try {
     const { id } = req.params;
     console.log("ID recibido para edit:", id);
-
     const examen = await Exam.findById(id);
     console.log("Datos obtenidos luego de metodo en modelo:", examen);
 
