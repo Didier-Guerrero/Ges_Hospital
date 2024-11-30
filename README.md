@@ -237,8 +237,7 @@ Gestión: Se permite editar o eliminar exámenes existentes.
 ### Contacto
  
 Email: didierguerrerosoft@gmail.com
-
 GitHub: https://github.com/Didier-Guerrero/Ges_Hospital.git
-GitHub - Didier-Guerrero/Ges_Hospital
-Contribute to Didier-Guerrero/Ges_Hospital development by creating an account on GitHub.
+
+
  
