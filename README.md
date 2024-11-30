@@ -1,108 +1,244 @@
-# Sistema de Gestión Hospitalaria
+# **Gestión de Hospitales**
+ 
+Este proyecto es un sistema de gestión hospitalaria que permite manejar casos médicos, sesiones relacionadas, exámenes solicitados y datos de pacientes. El objetivo principal es ofrecer una solución integral para registrar y visualizar la evolución de los pacientes y sus tratamientos, así como facilitar la interacción entre médicos, pacientes y administradores.
+ 
+---
+ 
+## **Características Principales**
+ 
+- **Gestión de Casos Médicos**:
 
-Este proyecto es una aplicación básica para la gestión de pacientes y casos médicos en un hospital. Incluye funcionalidades de autenticación, creación de usuarios, y la administración de historias médicas para ayudar a los médicos y administradores en la toma de decisiones clínicas.
+  - Registro de casos médicos asociados a un paciente y médico.
 
-## Funcionalidades
+  - Visualización detallada de casos médicos, incluyendo:
 
-### Gestión de Pacientes
-- **Autenticación**: Los usuarios pueden iniciar sesión y solo los administradores pueden registrar nuevos usuarios.
-- **Roles de Usuario**:
-  - **Admin**: Puede crear y gestionar usuarios (médicos y pacientes).
-  - **Médico**: Puede ver y gestionar los casos médicos.
-  - **Paciente**: Puede ver únicamente sus propios casos médicos.
+    - Enfermedad.
 
-### Gestión de Casos Médicos
-- **Creación de Casos**: Los médicos pueden crear nuevas historias médicas para los pacientes.
-- **Visualización de Casos**:
-  - **Médicos y Administradores**: Pueden ver todos los casos médicos y realizar búsquedas por enfermedad.
-  - **Pacientes**: Solo pueden ver sus propias historias médicas.
-- **Edición de Casos**: Los médicos pueden modificar los detalles de un caso, incluyendo enfermedad, diagnóstico, síntomas y tratamiento.
-- **Eliminación de Casos**: Los médicos pueden eliminar un caso cuando sea necesario.
+    - Diagnóstico.
 
-## Tecnologías Utilizadas
+    - Tratamiento inicial.
 
-- **Backend**: Node.js y Express
-- **Base de Datos**: Supabase
-- **Autenticación**: Basada en sesiones para el control de acceso
-- **Frontend**: Plantillas EJS
-- **CSS**: Estilos básicos en `public/css/styles.css`
+    - Porcentaje de éxito basado en sesiones relacionadas.
 
-## Instalación
+- **Gestión de Sesiones**:
 
-1. Clona el repositorio:
-    ```bash
-    git clone https://github.com/tu-usuario/tu-repositorio.git
-    cd tu-repositorio
-    ```
+  - Registro de sesiones asociadas a un caso médico.
 
-2. Instala las dependencias:
-    ```bash
-    npm install
-    ```
+  - Visualización de detalles de sesiones (evolución, tratamiento aplicado, observaciones, éxito).
 
-3. Configura el archivo `.env` con tus credenciales de Supabase:
-    ```
-    SUPABASE_URL=tu_url_de_supabase
-    SUPABASE_KEY=tu_key_de_supabase
-    ```
+  - Edición y eliminación de sesiones.
+ 
+- **Gestión de Exámenes**:
 
-4. Ejecuta el servidor:
-    ```bash
-    npm start
-    ```
+  - Solicitud de exámenes desde una sesión específica.
 
-5. Accede a la aplicación en tu navegador:
-    ```
-    http://localhost:5000
-    ```
+  - Visualización de detalles de exámenes solicitados (tipo, estado, fecha de solicitud y completado).
 
-## Rutas Principales
+  - Edición y eliminación de exámenes.
+ 
+- **Gestión de Pacientes**:
 
-- **`/api/users/login`**: Página de inicio de sesión para todos los usuarios.
-- **`/api/users/register`**: Registro de nuevos usuarios (solo accesible por un administrador).
-- **`/api/cases`**: Vista de todos los casos médicos (para médicos y administradores) o casos individuales (para pacientes).
-- **`/api/cases/:id`**: Detalles de un caso médico específico.
-- **`/api/cases/new`**: Formulario para la creación de un nuevo caso médico (para médicos y administradores).
-- **`/api/cases/:id/edit`**: Formulario de edición para un caso específico (solo médicos y administradores).
+  - Asociación de casos médicos a pacientes registrados.
 
-## Estructura de Archivos
-Ges_Hospital/
-├── public/
-│   └── css/
-│       └── styles.css               
-├── views/
-│   ├── cases/
-│   │   ├── index_patient.ejs        
-│   │   ├── index_doctor_admin.ejs  
-│   │   ├── show.ejs                 
-│   │   ├── create.ejs               
-│   │   └── edit.ejs                 
-│   └── users/
-│       ├── login.ejs                
-│       └── register.ejs             
-├── models/
-│   ├── User.js                      
-│   └── Case.js                      
+  - Visualización de datos de pacientes relacionados con cada caso.
+ 
+- **Estadísticas**:
+
+  - Cálculo automático del porcentaje de éxito de un caso médico basado en sesiones exitosas.
+
+  - Listado de casos médicos similares para análisis de patrones y reutilización de tratamientos.
+ 
+---
+ 
+## **Requisitos del Proyecto**
+ 
+### **Tecnologías Utilizadas**
+
+- **Backend**: Node.js con Express.
+
+- **Frontend**: Plantillas EJS para renderizar vistas.
+
+- **Base de Datos**: Supabase como servicio backend para consultas SQL.
+
+- **Gestión de Sesiones**: `express-session`.
+
+- **Middleware**: `method-override` para manejar métodos HTTP como PUT y DELETE.
+ 
+### **Dependencias**
+
+```bash
+
+express
+
+ejs
+
+body-parser
+
+method-override
+
+dotenv
+
+express-session
+
+supabase-js
+
+```
+ 
+### **Estructura del Proyecto**
+
+```
+
 ├── controllers/
-│   ├── userController.js            
-│   └── caseController.js            
+
+│   ├── caseController.js
+
+│   ├── sessionController.js
+
+│   ├── examController.js
+
+│   ├── userController.js
+
+├── models/
+
+│   ├── Case.js
+
+│   ├── Session.js
+
+│   ├── Exam.js
+
+│   ├── User.js
+
 ├── routes/
-│   ├── users.js                     
-│   └── cases.js                    
-├── config/
-│   └── supabase.js                  
-├── .env                           
-├── .gitignore                       
-├── package.json                    
-├── package-lock.json                
-└── server.js                       
-## Notas
 
-- **Archivos estáticos**: Los estilos CSS se encuentran en `public/css/styles.css`.
-- **Archivo de Configuración `.env`**: Asegúrate de configurar las credenciales de Supabase correctamente en el archivo `.env` y mantenerlo en privado.
+│   ├── cases.js
 
-## Próximos Pasos
+│   ├── sessions.js
 
-- Añadir funcionalidades de gestión de citas.
-- Implementacion de observaciones de citas medicas y casos de pacientes
-- Mejorar el sistema de reportes para casos médicos.
+│   ├── exams.js
+
+│   ├── users.js
+
+├── views/
+
+│   ├── cases/
+
+│   │   ├── show.ejs
+
+│   │   ├── edit.ejs
+
+│   │   ├── new.ejs
+
+│   ├── sessions/
+
+│   │   ├── details.ejs
+
+│   │   ├── edit.ejs
+
+│   │   ├── new.ejs
+
+│   ├── exams/
+
+│   │   ├── details.ejs
+
+│   │   ├── edit.ejs
+
+│   │   ├── new.ejs
+
+├── public/
+
+│   ├── css/
+
+│   │   ├── styles.css
+
+├── app.js
+
+├── .env
+
+└── README.md
+
+```
+ 
+Instalación y Configuración
+
+Requisitos Previos
+
+Node.js instalado en el sistema.
+
+Una base de datos configurada en Supabase.
+
+Pasos de Instalación
+ 
+ 
+Clonar el repositorio:
+
+```bash
+
+git clone https://github.com/Didier-Guerrero/Ges_Hospital.git
+
+cd Gestion_Hospital
+
+```
+
+Instalar dependencias:
+
+```bash
+
+npm install
+ 
+```
+ 
+Configurar variables de entorno: Crea un archivo .env en la raíz del proyecto y configura las siguientes variables:
+
+
+```bash
+SUPABASE_URL=<Tu_URL_de_Supabase>
+
+SUPABASE_KEY=<Tu_Clave_de_Supabase>
+
+```
+
+Iniciar el servidor:
+ ```bash
+node server.js
+
+```
+
+Abrir en el navegador: El servidor estará disponible en:
+
+```
+http://localhost:5000
+
+```
+
+Funcionalidades Detalladas
+
+Casos Médicos
+
+Creación: Los médicos pueden registrar nuevos casos médicos para pacientes.
+
+Visualización: Incluye enfermedad, diagnóstico, tratamiento inicial, y porcentaje de éxito calculado automáticamente.
+
+Edición y Eliminación: Los casos pueden ser modificados o eliminados por médicos o administradores.
+
+Sesiones
+
+Creación: Se pueden registrar sesiones asociadas a un caso médico.
+
+Visualización: Listado de sesiones con detalles de evolución, tratamiento, éxito, y observaciones.
+
+Estadísticas: Calcula automáticamente el porcentaje de éxito basado en sesiones exitosas.
+
+Exámenes
+
+Solicitud: Desde una sesión, se pueden solicitar exámenes médicos con tipo, estado y observaciones.
+
+Gestión: Se permite editar o eliminar exámenes existentes.
+ 
+### Contacto
+ 
+Email: didierguerrerosoft@gmail.com
+
+GitHub: https://github.com/Didier-Guerrero/Ges_Hospital.git
+GitHub - Didier-Guerrero/Ges_Hospital
+Contribute to Didier-Guerrero/Ges_Hospital development by creating an account on GitHub.
+ 
