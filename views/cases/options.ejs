@@ -10,7 +10,7 @@
     <div class="container">
       <h1>Caso Médico Registrado</h1>
       <p>¿Qué desea hacer con este caso?</p>
-
+      <p><%= caso.id %></p>
       <div class="button-group">
         <form action="/api/cases/<%= caso.id %>/analyze" method="POST">
           <button type="submit" class="button">Analizar Caso</button>

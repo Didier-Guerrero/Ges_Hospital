@@ -1,19 +1,11 @@
-const Exam = require("../models/Exam");
-const Session = require("../models/Session");
+const ExamService = require('../services/ExamService');
 
-// Mostrar formulario para solicitar un nuevo examen
 exports.showCreateExamForm = async (req, res) => {
   try {
     const { sessionId } = req.query;
 
     // Buscar la sesión asociada
-    const { data: sesion, error } = await Session.findById(sessionId);
-    if (error || !sesion) {
-      return res.status(404).render("errors/404", {
-        message: "Sesión no encontrada.",
-      });
-    }
-
+    const sesion = await ExamService.getSessionDetails(sessionId);
     res.render("exams/new", { sessionId, sesion });
   } catch (error) {
     console.error("Error al cargar el formulario de examen:", error.message);
@@ -23,10 +15,12 @@ exports.showCreateExamForm = async (req, res) => {
   }
 };
 
-// Crear un nuevo examen
 exports.createExam = async (req, res) => {
   try {
-    const {
+    const { sessionId, caseId, type, requested_date, completion_date, result, status, observations } = req.body;
+
+    // Llamar al servicio para crear el examen
+    await ExamService.createExam({
       sessionId,
       caseId,
       type,
@@ -34,22 +28,8 @@ exports.createExam = async (req, res) => {
       completion_date,
       result,
       status,
-      observations,
-    } = req.body;
-
-    // Crear un nuevo examen
-    const { error } = await Exam.create({
-      session_id: sessionId,
-      case_id: caseId,
-      type,
-      requested_date: new Date(requested_date),
-      completion_date: completion_date ? new Date(completion_date) : null,
-      result: result || null,
-      status,
-      observations: observations || null,
+      observations
     });
-
-    if (error) throw new Error("Error al crear el examen.");
 
     res.redirect(`/api/sessions/${sessionId}`);
   } catch (error) {
@@ -59,23 +39,14 @@ exports.createExam = async (req, res) => {
     });
   }
 };
-// Ver detalles de un examen
+
 exports.showExamDetails = async (req, res) => {
   try {
     const { id } = req.params;
 
-    console.log("ID recibido para detalles del examen:", id);
+    // Llamar al servicio para obtener los detalles del examen
+    const examen = await ExamService.getExamById(id);
 
-    const examen = await Exam.findById(id);
-
-    if (!examen) {
-      console.error("Examen no encontrado para ID:", id);
-      return res.status(404).render("errors/404", {
-        message: "Examen no encontrado.",
-      });
-    }
-
-    console.log("Examen encontrado:", examen);
     res.render("exams/details", { examen });
   } catch (error) {
     console.error("Error al mostrar los detalles del examen:", error.message);
@@ -85,19 +56,13 @@ exports.showExamDetails = async (req, res) => {
   }
 };
 
-// Mostrar formulario de edición de un examen
 exports.showEditExamForm = async (req, res) => {
   try {
     const { id } = req.params;
-    console.log("ID recibido para edit:", id);
-    const examen = await Exam.findById(id);
-    console.log("Datos obtenidos luego de metodo en modelo:", examen);
 
-    if (!examen) {
-      return res.status(404).render("errors/404", {
-        message: "Examen no encontrado.",
-      });
-    }
+    // Llamar al servicio para obtener los detalles del examen
+    const examen = await ExamService.getExamById(id);
+
     if (examen.requested_date) {
       examen.requested_date = new Date(examen.requested_date);
     }
@@ -114,30 +79,20 @@ exports.showEditExamForm = async (req, res) => {
   }
 };
 
-// Actualizar un examen
 exports.updateExam = async (req, res) => {
   try {
     const { id } = req.params;
-    const {
+    const { type, requested_date, completion_date, status, result, observations } = req.body;
+
+    // Llamar al servicio para actualizar el examen
+    await ExamService.updateExam(id, {
       type,
       requested_date,
       completion_date,
       status,
       result,
-      observations,
-    } = req.body;
-
-    // Actualizar el examen con los datos proporcionados
-    const updatedExam = await Exam.update(id, {
-      type,
-      requested_date: new Date(requested_date),
-      completion_date: completion_date ? new Date(completion_date) : null,
-      status,
-      result,
-      observations,
+      observations
     });
-
-    console.log("Examen actualizado:", updatedExam);
 
     res.redirect(`/api/exams/${id}`);
   } catch (error) {
@@ -148,19 +103,12 @@ exports.updateExam = async (req, res) => {
   }
 };
 
-// Eliminar un examen
 exports.deleteExam = async (req, res) => {
   try {
     const { id } = req.params;
 
-    // Eliminar el examen
-    const examenEliminado = await Exam.delete(id);
-
-    if (!examenEliminado) {
-      return res.status(404).render("errors/404", {
-        message: "Examen no encontrado para eliminar.",
-      });
-    }
+    // Llamar al servicio para eliminar el examen
+    await ExamService.deleteExam(id);
 
     res.redirect(`/api/sessions/${req.query.sessionId}`);
   } catch (error) {

@@ -1,58 +1,42 @@
-const User = require("../models/User");
-const bcrypt = require("bcryptjs");
+const UserService = require('../services/UserService');
 
 exports.createUser = async (req, res) => {
-  const { nombre, email, password, role } = req.body;
-  const { data, error } = await User.create({ nombre, email, password, role });
-  if (error) return res.status(500).json({ message: error.message });
-  res.redirect("/api/users/login");
-};
+  try {
+    if (req.session.userRole !== 'admin') {
+      return res.status(403).json({ message: "Acceso denegado: Solo administradores pueden registrar usuarios." });
+    }
 
-exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  const { data: user, error } = await User.findByEmail(email);
-  if (error || !user)
-    return res.status(400).json({ message: "Credenciales inválidas" });
+    const { nombre, email, password, role } = req.body;
+    const user = await UserService.createUser({ nombre, email, password, role });
 
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch)
-    return res.status(400).json({ message: "Credenciales inválidas" });
-
-  req.session.userId = user.id;
-  res.redirect("/api/cases");
-};
-
-exports.login = async (req, res) => {
-  const { email, password } = req.body;
-  const { data: user, error } = await User.findByEmail(email);
-  if (error || !user)
-    return res.status(400).json({ message: "Credenciales inválidas" });
-
-  const isMatch = await bcrypt.compare(password, user.password);
-  if (!isMatch)
-    return res.status(400).json({ message: "Credenciales inválidas" });
-
-  req.session.userId = user.id;
-  req.session.userRole = user.role;
-  res.redirect("/api/cases");
-};
-
-exports.createUser = async (req, res) => {
-  if (req.session.userRole !== "admin") {
-    return res
-      .status(403)
-      .send("Acceso denegado: Solo administradores pueden registrar usuarios.");
+    res.redirect("/api/users/login");
+  } catch (error) {
+    console.error("Error al crear el usuario:", error.message);
+    res.status(500).json({ message: `Error al crear el usuario: ${error.message}` });
   }
+};
 
-  const { nombre, email, password, role } = req.body;
-  const { data, error } = await User.create({ nombre, email, password, role });
-  if (error) return res.status(500).json({ message: error.message });
-  res.redirect("/api/users/login");
+exports.login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const user = await UserService.login({ email, password });
+
+    req.session.userId = user.id;
+    req.session.userRole = user.role;
+
+    res.redirect("/api/cases");
+  } catch (error) {
+    console.error("Error al iniciar sesión:", error.message);
+    res.status(400).json({ message: "Credenciales inválidas" });
+  }
 };
 
 exports.logout = (req, res) => {
-  req.session.destroy((err) => {
-    if (err) return res.status(500).json({ message: "Error al cerrar sesión" });
+  try {
+    UserService.logout(req);
     res.redirect("/api/users/login");
-  });
+  } catch (error) {
+    console.error("Error al cerrar sesión:", error.message);
+    res.status(500).json({ message: "Error al cerrar sesión" });
+  }
 };
